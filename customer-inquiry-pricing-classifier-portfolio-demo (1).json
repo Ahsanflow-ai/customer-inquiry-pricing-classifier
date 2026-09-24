@@ -1,0 +1,721 @@
+{
+  "name": "Customer Inquiry Pricing Classifier - Portfolio Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-inquiry-demo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "cdc0524e-554f-4423-ba6b-8402abac378b",
+      "name": "Receive Customer Inquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1392,
+        -240
+      ],
+      "webhookId": "4870a5f4-9b18-4234-94e4-a1bda657c51e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "587cee0e-1e42-4671-8cb5-b3d131cda1bb",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "33b2adf8-fb25-488c-b6cb-4147775fbc22",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "000b46dc-25d1-4ae8-8391-3a62b462ca28",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "55d76398-0310-4508-a24c-72a702d37613",
+      "name": "Validate Required Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1168,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "26a5457c-afd5-4610-bce9-fd181339b6ee",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "538c3ea0-b94b-4842-963a-5ec764d66694",
+      "name": "Validate Email",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -944,
+        -336
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ef162454-c196-45d5-b48c-722506128c6a",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "pricing",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0f809bb9-7ba6-49b4-b251-c6b405adcfad",
+      "name": "Classify Inquiry",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -720,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1b62bfd-a790-48d5-847c-b3a1faca377d",
+              "name": "category",
+              "value": "sales_lead",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "5d1e5b09-8ef7-4555-8c0e-46392ac58537",
+      "name": "set sales lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        -432
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "DEMO_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Demo Sales Inquiries",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DEMO_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DEMO_SPREADSHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.body.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43c0562b-c77d-4b3e-a6dd-d07560dcf3e4",
+      "name": "Search Existing Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        -336
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b8acd103-d842-46c9-84a3-01396d5d9515",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "902e7ce0-44a0-4bdd-b257-894c6607d3bd",
+      "name": "Lead Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        -336
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "DEMO_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Demo Sales Inquiries",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DEMO_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DEMO_SPREADSHEET_ID/edit#gid=0"
+        },
+        "operation": "update",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Receive Customer Inquiry').item.json.body.name }}",
+            "Email": "={{ $('Receive Customer Inquiry').item.json.body.email }}",
+            "Message": "={{ $('Receive Customer Inquiry').item.json.body.message }}",
+            "Category": "={{ $('Receive Customer Inquiry').item.json.body.message.toLowerCase().includes('pricing') ? 'sales_lead' : 'general_inquiry' }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b0c44887-1ebc-454c-937d-3eb3805902d0",
+      "name": "Update Existing Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        -432
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a4a7f208-0486-4140-bf2b-25ec94dd802a",
+              "leftValue": "={{ $if($('set sales lead').isExecuted, 'sales_lead', 'general_inquiry') }}",
+              "rightValue": "sales_lead",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "11be90de-91e3-46cf-9c7b-e74800f3713c",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -336
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "sendTo": "demo-owner@example.com",
+        "subject": "New Sales Lead",
+        "message": "=New sales lead received.\nName: {{ $json.Name }}\nEmail: {{ $json.Email }}\nMessage: {{ $json.Message }}\nCategory: {{ $json.Category }}",
+        "options": {}
+      },
+      "id": "4c46b06a-c11f-4c82-9a1d-79a2e3cd0ede",
+      "name": "owner notification (demo)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -432
+      ],
+      "webhookId": "86d9c48b-2910-4168-9079-bc6b36af9305"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "545ca695-bced-4d2c-a9a3-1e6aedbe93e1",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        848,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Receive Customer Inquiry').item.json.body.email }}",
+        "subject": "=We received your inquiry",
+        "message": "=Hi {{ $('Receive Customer Inquiry').item.json.body.name }}\nThanks for contacting us.\n\nWe received your inquiry and will get back to you soon.\n\nRegards\nSupport Team",
+        "options": {}
+      },
+      "id": "5007ba00-5a65-4b64-875c-eb9a796f7064",
+      "name": "customer message thank you",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -240
+      ],
+      "webhookId": "a0640a0a-6721-4d6a-8f39-5e4c76e6db2f"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "DEMO_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Demo Sales Inquiries",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DEMO_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DEMO_SPREADSHEET_ID/edit#gid=0"
+        },
+        "operation": "append",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Receive Customer Inquiry').item.json.body.name }}",
+            "Email": "={{ $('Receive Customer Inquiry').item.json.body.email }}",
+            "Message": "={{ $('Receive Customer Inquiry').item.json.body.message }}",
+            "Category": "={{ $if($('set sales lead').isExecuted, 'sales_lead', 'general_inquiry') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7a69eb90-c39c-4aff-bc73-6d27eaa91295",
+      "name": "Create New Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        -240
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "57b55e5a-c20d-45c8-b848-21514c1ed43f",
+              "name": "category",
+              "value": "general_inquiry",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "f4922c89-0e2f-485d-832b-c028ead4269c",
+      "name": "general inquiry",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"Missing required field: name, email or message\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "c767de89-0d00-43a3-8c1c-ee57118e2fcf",
+      "name": "Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -944,
+        -144
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive Customer Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Validate Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Fields": {
+      "main": [
+        [
+          {
+            "node": "Validate Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Email": {
+      "main": [
+        [
+          {
+            "node": "Classify Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Inquiry": {
+      "main": [
+        [
+          {
+            "node": "set sales lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "general inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set sales lead": {
+      "main": [
+        [
+          {
+            "node": "Search Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "Lead Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Exists": {
+      "main": [
+        [
+          {
+            "node": "Update Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "owner notification (demo)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "customer message thank you",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "owner notification (demo)": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "customer message thank you": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Lead": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "general inquiry": {
+      "main": [
+        [
+          {
+            "node": "Search Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "tags": []
+}
